@@ -1,0 +1,6 @@
+ALTER TABLE jobs 
+ADD COLUMN company VARCHAR(255),
+ADD COLUMN location VARCHAR(255),
+ADD COLUMN application_deadline DATE,
+ADD COLUMN job_listing TEXT, 
+ALTER COLUMN title SET NOT NULL;
