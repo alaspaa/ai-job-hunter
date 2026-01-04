@@ -1,25 +1,35 @@
 
 
-Next steps
+# JOB HUNTER
 
-- add datasource
-- add post endpoint for jobs
-- add ability to upload cv
-- add ai agent that uses url to retreive job listing info
-- add ai agent that writes application for listing using listing and cv data
-- add authentication
-- add testing framework
+An AI assisted job hunter that helps me apply for new positions.
+There are three major things that this application does
+
+1. Helps me keep a log of where I have applied to. In case the application is slow or the volume is high, listings are saved and statuses can be updated as processes move forward or end.
+
+2. Assists me in generating cover letters with the help of AI in case one is required for a specific listing
+
+3. Keeps me sharp. I've noticed that a node and typescript have become very popular and seem to have a lot of opportuinities open. This is mainly my attempt at getting more into the typescript of it all. 
+
+
+### Next steps
+
+- Implement job listing status updates
+- Add authentication
+- Add testing framework
+- Fix linter and/or prettier
+- Maybe refactor in order to use a different more automatic datasource that is capable of translating between db column names and javascript field names
+
 
 AI:
-In this project I opted to use deepseek as the AI component, but as far as I know the sdk is interchangable with (at least some) openai models
+In odrder to generate cover letters and sort data this project uses the gpt-5-nano model.
+The requests to AI are very slow so patience is key.
 
-useful links
-- deepseek docs https://api-docs.deepseek.com/
 
-Required environment variables
+## Environment variables
+This is a list of environm,ent variable that are reqwuired to run the application
 
-PORT
-NODE_ENV
-CONNECTION_STRING
-AI_API_URL
-AI_API_KEY
+- PORT: number
+- NODE_ENV: dev
+- CONNECTION_STRING: postgres://username:password@localhost:5432/database
+- AI_API_KEY: open ai platform key
