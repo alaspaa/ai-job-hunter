@@ -14,6 +14,7 @@ There are three major things that this application does
 
 ### Next steps
 
+- Add some form of UI
 - Implement job listing status updates
 - Add authentication
 - Add testing framework
