@@ -17,9 +17,9 @@ const router = Router()
 
 router.get('/', getCVs)
 
-router.get('/:id', getCVById)
+router.get('/:name', getCVById)
 
 // Accepts a form field named `document` containing the PDF
-router.post('/:id', upload.single('document'), createCV)
+router.post('/:name', upload.single('document'), createCV)
 
 export default router

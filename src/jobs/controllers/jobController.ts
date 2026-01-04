@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import Job from "../models/job"
 import JobRepository, { JobRepositoryImplementation } from "../repository/jobRepository"
-import { queryAIForJobDetails } from "../../ai/aiservice";
+import { queryAIForJobDetails, queryAIForCoverLetter } from "../../ai/aiservice";
+import { getCVAsText } from "../../cv/cvController"
 import extractTextFromUrl from "../../scraper/textExtractor";// TODO: rename this file
 
 const repo: JobRepository = new JobRepositoryImplementation();
@@ -60,4 +61,49 @@ export const createJob = async (req: Request, res: Response, next: NextFunction)
     } catch(error) {
         next(error)
     }
+}
+
+export const createCoverLetter = async (req: Request, res: Response, next: NextFunction) => {
+    console.info(`creating cover letter`)
+    const jobId = Number(req.params.id)
+    if(isNaN(jobId)) {
+        return res.status(400).json({error: `${req.params.id} cannot be cast to number`})
+    }
+    
+    const cvName = req.body.cvName
+    if(!cvName) {
+        return res.status(400).json({error: "cvName cannot be null"})
+    }
+    try {
+        console.info("geting job info")
+        const job: Job | null = await repo.getJobById(jobId)
+        if(!job) {
+            return res.status(404).json({error: `Could not find job with the id ${jobId}`})
+        }
+        if(job.coverletter) {
+            return res.status(400).json({error: `Job with the id ${jobId} already has a cover letter`})
+        }
+        if(!job.joblisting) {
+            console.info(job)
+            return res.status(400).json({error: `Could not find job listing for job with the id ${jobId}`})
+        }
+
+
+        console.info("getting cv text")
+        const cv = await getCVAsText(cvName)
+
+        const coverLetter = await queryAIForCoverLetter(job.joblisting, cv)
+
+        // save cover letter to db
+        const updatedJob = await repo.updateJobCoverLetter(
+            jobId,
+            coverLetter,
+        )
+
+        return res.status(200).json(updatedJob)
+    } catch(error) {
+        console.error(error)
+        next(error)
+    }
+    
 }

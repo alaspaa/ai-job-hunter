@@ -11,6 +11,8 @@ export default async function extractTextFromUrl(
         url: string,
         website: string | null = null,
 ): Promise<string> {
+        console.info("Extracting text")
+        
         const selectors = website ? WEBSITE_SELECTORS.get(website.toUpperCase()) : DEFAULT_SELECTORS
         if(!selectors) {
                 throw new Error(`Unsupported website: ${website}`);
