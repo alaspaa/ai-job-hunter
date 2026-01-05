@@ -10,8 +10,16 @@ let context = [
   { role: "role", content: "What is the capital of France?" }
 ];
 
+export interface JobListingSchema {
+  company: string;
+  jobTitle: string;
+  location: string;
+  applicationDeadline: string;
+  jobListing: string;
+}
+
 //
-export async function queryAIForJobDetails(listingText: string): Promise<string> {
+export async function queryAIForJobDetails(listingText: string): Promise<JobListingSchema> {
   if(!listingText || listingText.length === 0) {
         throw new Error("Listing text is empty");
   }
@@ -19,7 +27,8 @@ export async function queryAIForJobDetails(listingText: string): Promise<string>
   console.info("Sending raw data to AI for handling")
   
   const response = await openai.responses.create({
-      instructions: `Using the input text please extract the job listing information and reply with the information partaining to the job listing according to the following json schema
+      instructions: `Using the input text please extract the job listing information and reply with the information partaining to the job listing according to the attached json schema.
+      Json Schema:
       {
         \"company\": \"string\",
         \"jobTitle\": \"string\",
@@ -27,15 +36,17 @@ export async function queryAIForJobDetails(listingText: string): Promise<string>
         \"applicationDeadline\": \"string\",
         \"jobListing\": \"string\",
       }
+        Try to keep paragraphs and formatting in the output text as much as possible. The jobListing field does not ned redundant information such as company name, location, or job title. Only include the main body of the job listing in that field.
       `,
       input:  listingText,
-      temperature: 0.5,
+      //temperature: 0.5,
       model: "gpt-5-nano",
     },
   );
 
   console.log("AI Response:", response.output_text);
-  return response.output_text
+  return JSON.parse(response.output_text) as JobListingSchema;
+  //return response.output_text
 }
 
 export async function queryAIForCoverLetter(

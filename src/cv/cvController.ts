@@ -3,7 +3,6 @@ import fs from 'fs'
 import path from 'path'
 import { PDFParse } from "pdf-parse";
 import { readFile } from "fs/promises";
-import { parseArgs } from "util";
 
 const getUploadsFilePath = (): string => {
     return path.join(process.cwd(), 'uploads', 'cvs')

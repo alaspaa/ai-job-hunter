@@ -1,5 +1,5 @@
+import { JobListingSchema } from "../../ai/aiservice.js";
 
-@Table
 export default interface Job {
     id: number | null;
     jobtitle?: string | null;
@@ -13,4 +13,20 @@ export default interface Job {
     coverletter?: string | null;
     created_at: Date | null;
     updated_at: Date | null;
+}
+
+
+export const fromJobListingSchema = (jobListing: JobListingSchema, url: string): Job => { 
+    return {
+        id: null,
+        company: jobListing.company,
+        jobtitle: jobListing.jobTitle,
+        location: jobListing.location,
+        applicationdeadline: new Date(jobListing.applicationDeadline),
+        joblisting: jobListing.jobListing,
+        status: 'interested',
+        url: url,
+        created_at: null,
+        updated_at: null,
+    };
 }

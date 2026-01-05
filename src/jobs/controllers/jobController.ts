@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
-import Job from "../models/job"
+import Job, { fromJobListingSchema } from "../models/job"
 import JobRepository, { JobRepositoryImplementation } from "../repository/jobRepository"
-import { queryAIForJobDetails, queryAIForCoverLetter } from "../../ai/aiservice";
+import { queryAIForJobDetails, queryAIForCoverLetter, JobListingSchema } from "../../ai/aiservice";
 import { getCVAsText } from "../../cv/cvController"
 import extractTextFromUrl from "../../scraper/textExtractor";// TODO: rename this file
 
@@ -50,11 +50,9 @@ export const createJob = async (req: Request, res: Response, next: NextFunction)
         );
 
         //extract text from joblisting using AI
-        const processedText = await queryAIForJobDetails(listingText);
+        const aiResponse: JobListingSchema = await queryAIForJobDetails(listingText);
         
-        let job = JSON.parse(processedText) as Job;
-        job.url = req.body.url;
-        job.status = 'interested';
+        const job: Job = fromJobListingSchema(aiResponse, url);
 
         const newJob = await repo.createJob(job);
         res.status(201).json(newJob);
@@ -62,6 +60,8 @@ export const createJob = async (req: Request, res: Response, next: NextFunction)
         next(error)
     }
 }
+
+
 
 export const createCoverLetter = async (req: Request, res: Response, next: NextFunction) => {
     console.info(`creating cover letter`)
