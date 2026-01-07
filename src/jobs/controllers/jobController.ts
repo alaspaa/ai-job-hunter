@@ -51,7 +51,7 @@ export const createJob = async (req: Request, res: Response, next: NextFunction)
             website: website
         })
 
-        return res.status(200)
+        return res.status(202).json({"status": "accepted"})
     } catch(error) {
         next(error)
     }
@@ -68,7 +68,7 @@ export const createJobFromlistingAddress = async (listing: createListing) => {
         const newJob = await repo.createJob(
             fromJobListingSchema(aiResponse, listing.url)
         ) 
-        
+
         jobSocket.emitJobUpdate(newJob)
     } catch(error) {
         console.error(error)
