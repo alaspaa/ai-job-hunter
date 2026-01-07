@@ -32,13 +32,18 @@
   "dependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
+    "bullmq": "^5.66.4",
     "cors": "^2.8.5",
+    "express-ws": "^5.0.2",
     "globals": "^16.5.0",
     "html-to-text": "^9.0.5",
+    "ioredis": "^5.9.0",
     "multer": "^2.0.2",
     "node-flyway": "^0.0.13",
     "openai": "^6.15.0",
     "pdf-parse": "^2.4.5",
-    "pg-promise": "^12.3.0"
+    "pg-promise": "^12.3.0",
+    "redis": "^5.10.0",
+    "socket.io": "^4.8.3"
   }
 }

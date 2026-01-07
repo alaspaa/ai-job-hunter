@@ -35,17 +35,18 @@ class JobRepositoryImplementation implements JobRepository {
     updated_at`
 
     async getAllJobs(): Promise<Job[]> {
-        const result = await datasource.many(
+        const result = await datasource.manyOrNone(
             `SELECT 
                 ${this.allColumns}
             FROM 
                 jobs`
         );
+        
         return result as Job[];
     }
 
     async getJobById(id: number): Promise<Job | null> {
-        const result = await datasource.one
+        const result = await datasource.oneOrNone
         (`SELECT 
             ${this.allColumns}
         FROM 

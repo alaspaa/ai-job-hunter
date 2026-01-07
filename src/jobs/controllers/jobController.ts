@@ -4,6 +4,8 @@ import JobRepository, { JobRepositoryImplementation } from "../repository/jobRep
 import { queryAIForJobDetails, queryAIForCoverLetter, JobListingSchema } from "../../ai/aiservice";
 import { getCVAsText } from "../../cv/cvController"
 import extractTextFromUrl from "../../scraper/textExtractor";// TODO: rename this file
+import { addJobListingToQueue, createListing } from "../../queue/MessageQueue";
+import { jobSocket } from "../../app";
 
 const repo: JobRepository = new JobRepositoryImplementation();
 
@@ -44,24 +46,35 @@ export const createJob = async (req: Request, res: Response, next: NextFunction)
             return res.status(409).send('Job with the same URL already exists');
         }
 
-        const listingText = await extractTextFromUrl(
-            url,
-            website,
-        );
+        addJobListingToQueue({
+            url: url,
+            website: website
+        })
 
-        //extract text from joblisting using AI
-        const aiResponse: JobListingSchema = await queryAIForJobDetails(listingText);
-        
-        const job: Job = fromJobListingSchema(aiResponse, url);
-
-        const newJob = await repo.createJob(job);
-        res.status(201).json(newJob);
+        return res.status(200)
     } catch(error) {
         next(error)
     }
 }
 
+export const createJobFromlistingAddress = async (listing: createListing) => {
+    try {
+        console.info(`Creating new job for ${listing.url}`)
 
+        const listingText = await extractTextFromUrl(listing)
+        
+        const aiResponse: JobListingSchema = await queryAIForJobDetails(listingText)
+
+        const newJob = await repo.createJob(
+            fromJobListingSchema(aiResponse, listing.url)
+        ) 
+        
+        jobSocket.emitJobUpdate(newJob)
+    } catch(error) {
+        console.error(error)
+        throw error
+    }
+}
 
 export const createCoverLetter = async (req: Request, res: Response, next: NextFunction) => {
     console.info(`creating cover letter`)

@@ -1,3 +1,4 @@
+import { createListing } from "../queue/MessageQueue";
 const { convert } = require('html-to-text');
 
 const WEBSITE_SELECTORS: Map<string, { selectors: string[] }> = new Map([
@@ -8,19 +9,18 @@ const WEBSITE_SELECTORS: Map<string, { selectors: string[] }> = new Map([
 const DEFAULT_SELECTORS = { selectors: [ 'body' ] }
 
 export default async function extractTextFromUrl(
-        url: string,
-        website: string | null = null,
+        listing: createListing
 ): Promise<string> {
         console.info("Extracting text")
         
-        const selectors = website ? WEBSITE_SELECTORS.get(website.toUpperCase()) : DEFAULT_SELECTORS
+        const selectors = listing.website ? WEBSITE_SELECTORS.get(listing.website.toUpperCase()) : DEFAULT_SELECTORS
         if(!selectors) {
-                throw new Error(`Unsupported website: ${website}`);
+                throw new Error(`Unsupported website: ${listing.website}`);
         }
 
-        const fetchResult = await fetch(url);
+        const fetchResult = await fetch(listing.url);
         if(!fetchResult.ok) {
-                throw new Error(`Failed to fetch URL: ${url}`);
+                throw new Error(`Failed to fetch URL: ${listing.url}`);
         }
 
         const responseBody = await fetchResult.text();
