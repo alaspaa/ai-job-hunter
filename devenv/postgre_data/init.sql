@@ -1,0 +1,2 @@
+CREATE DATABASE  possu;
+CREATE DATABASE  keycloak;

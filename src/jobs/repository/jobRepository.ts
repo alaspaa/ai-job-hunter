@@ -41,8 +41,7 @@ class JobRepositoryImplementation implements JobRepository {
             FROM 
                 jobs`
         );
-        
-        return result as Job[];
+        return result as Job[] ?? [];
     }
 
     async getJobById(id: number): Promise<Job | null> {

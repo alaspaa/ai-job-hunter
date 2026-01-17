@@ -2,7 +2,7 @@ services:
 
   db:
     image: postgres
-    restart: unless-stopped
+    restart: always
     # set shared memory limit when using docker compose
     shm_size: 128mb
     # or set shared memory limit when deploy via swarm stack
@@ -15,12 +15,12 @@ services:
       POSTGRES_PASSWORD: dbpass
       POSTGRES_USER: dbuser
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgre_data/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
   redis:
     image: redis:8.4.0
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
       - redis_data:/data
@@ -30,13 +30,43 @@ services:
       - redisNetwork
   redis_insight:
     image: redis/redisinsight
-    restart: unless-stopped
+    restart: always
     ports:
       - 5540:5540
     volumes:
       - redis_volume_data:/db
     networks:
       - redisNetwork
+
+  keycloak:
+    image: keycloak/keycloak:nightly
+    restart: always
+    depends_on: 
+      - db
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_PASSWORD: password
+
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/keycloak
+      KC_DB_USERNAME: dbuser
+      KC_DB_PASSWORD: dbpass 
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8090
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+
+    command:
+      start-dev
+
+    ports: 
+      - 8090:8090
+
 networks:
   redisNetwork:
     driver: bridge
@@ -46,3 +76,4 @@ networks:
 volumes:
   redis_volume_data:
   redis_data:
+  postgre_data:
