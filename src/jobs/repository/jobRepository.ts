@@ -59,7 +59,7 @@ class JobRepositoryImplementation implements JobRepository {
         const result = await datasource.one(
             `INSERT INTO jobs (company, title, location, url, job_listing, status, application_deadline) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) 
-            RETURNING *`, 
+            RETURNING ${this.allColumns}`, 
             [job.company, job.jobtitle, job.location, job.url, job.joblisting, job.status, job.applicationdeadline]
         );
         return result;
@@ -79,7 +79,7 @@ class JobRepositoryImplementation implements JobRepository {
     }
     
     async updateJobCoverLetter(id: number, coverLetter: string): Promise<Job> {
-        return await datasource.one('UPDATE jobs SET cover_letter = $1, updated_at = NOW() WHERE id = $2 RETURNING *', [coverLetter, id]);
+        return await datasource.one(`UPDATE jobs SET cover_letter = $1, updated_at = NOW() WHERE id = $2 ${this.allColumns} *`, [coverLetter, id]);
     }
 }
 
